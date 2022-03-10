@@ -52,25 +52,21 @@ def index():
 
 @app.route('/watermark', methods=['POST'])
 def apply_watermark():
-    bucket_name = "cgc-lab3"
+    bucket_name = "cgc3"
 
     filename = request.form['filename']
     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     r1 = s3_client.upload_file(path, bucket_name, filename, ExtraArgs={'ACL': 'public-read'})
 
     img_url = get_s3_url(bucket_name, filename)
-    qr_req_url = f"https://qrackajack.expeditedaddons.com/?api_key={os.environ['QRACKAJACK_API_KEY']}" \
-                 f"&content={img_url}"
-
+    qr_req_url = "https://qrackajack.expeditedaddons.com/?api_key=8275CRVT6JPU3Z3089E1YO06AIKXLW45QHD1MNGF2S7B94&content=http://example.org&width=256&height=256&fg_color=#000000&bg_color=#ffffff"
     qr_name = f"qr_{filename}"
     qr_path = request_and_save(qr_req_url, qr_name)
 
     r2 = s3_client.upload_file(qr_path, bucket_name, qr_name, ExtraArgs={'ACL': 'public-read'})
 
     qr_url = get_s3_url(bucket_name, qr_name)
-    watermark_req_url = f"https://watermarker.expeditedaddons.com/?api_key={os.environ['WATERMARKER_API_KEY']}" \
-                        f"&opacity=80&position=center&image_url={img_url}&watermark_url={qr_url}" \
-                        f"&width=800&height=800"
+    watermark_req_url = "https://watermarker.expeditedaddons.com/?api_key=B74RH5DYMWEFTXO50PIA2739ZJ0N8Q6GKS2681ULV4C931&image_url=https://www.expeditedaddons.com/base.png&watermark_url=https://www.expeditedaddons.com/watermark.png&opacity=50&position=center&width=100&height=100"
 
     watermark_name = f"watermark_{filename}"
 
